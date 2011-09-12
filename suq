@@ -44,21 +44,28 @@ sub help {
     print <<'EOF';
 Usage: suq [options] [command]
 
-Options:
---help    help; show this help text
+[options] is one of --help or --version
+[command] is the string that will be executed with root permissions
+
+If an [option] is found, the rest of the command string will be ignored.
 
 Set the environment variable SUQ_SIMULATE in order to prevent suq from
 actually executing the command (the command will only be printed).
+Example:
+    % export SUQ_SIMULATE=1; suq perl -le 'print "foo"'
+    su -l -c 'perl -le '\''print "foo"'\' root
+    % 
 
-[command] is the string that will be executed with root permissions.
 
 Visit https://github.com/dbb/suq for the README or to report any issues.
 
 EOF
+    exit 0;
 }
 
 sub version {
     say "suq version $suq_version"
+    exit 0;
 }
 
 exit 0;

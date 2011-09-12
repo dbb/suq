@@ -4,6 +4,8 @@ use strict;
 use String::ShellQuote; # Debian: libstring-shellquote-perl
 use warnings;
 
+my $suq_version = '0.1';
+
 # Since --help could potentially be a part of the command, we will only call
 # the sub if it's the first comand line arg.
 if ( $ARGV[0] eq '--help' ) {
@@ -53,6 +55,10 @@ actually executing the command (the command will only be printed).
 Visit https://github.com/dbb/suq for the README or to report any issues.
 
 EOF
+}
+
+sub version {
+    say "suq version $suq_version"
 }
 
 exit 0;

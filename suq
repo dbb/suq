@@ -25,10 +25,10 @@ sub command {
     # `aptitude install ~nzsh`
     my $args = shell_quote @ARGV;
 
-    # some "aliases"
-    $args =~ s/\s*apin\s+/aptitude install -P /;
-    $args =~ s/\s*appg\s+/aptitude purge -P /;
-    $args =~ s/\s*aprm\s+/aptitude remove -P /;
+    # some example "aliases"
+    # $args =~ s/\s*apin\s+/aptitude install -P /;
+    # $args =~ s/\s*appg\s+/aptitude purge -P /;
+    # $args =~ s/\s*aprm\s+/aptitude remove -P /;
 
     # Now we quote the quoted command so that the whole thing can be passed
     # as a single arg to -c

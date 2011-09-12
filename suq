@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+use 5.010;
+use strict;
+use String::ShellQuote; # Debian: libstring-shellquote-perl
+use warnings;
+
+# Since --help could potentially be a part of the command, we will only call
+# the sub if it's the first comand line arg.
+if ( $ARGV[0] eq '--help' ) {
+    &help;
+}
+# Same for version
+elsif ( $ARGV[0] eq '--version' ) {
+    &version;
+}
+# Otherwise, assume business as usual
+else {
+    &command;
+}
+
+sub command {
+    # First, we quote @ARGV. This is necessary for special commands like
+    # `aptitude install ~nzsh`
+    my $args = shell_quote @ARGV;
+
+    # some "aliases"
+    $args =~ s/\s*apin\s+/aptitude install -P /;
+    $args =~ s/\s*appg\s+/aptitude purge -P /;
+    $args =~ s/\s*aprm\s+/aptitude remove -P /;
+
+    # Now we quote the quoted command so that the whole thing can be passed
+    # as a single arg to -c
+    my $qtd = shell_quote $args;
+
+    my $su_call = 'su -l -c ' . $qtd . ' root';
+
+    say $su_call;
+    system $su_call unless $ENV{SUQ_SIMULATE};
+}
+
+sub help {
+    print <<'EOF';
+Usage: suq [options] [command]
+
+Options:
+--help    help; show this help text
+
+Set the environment variable SUQ_SIMULATE in order to prevent suq from
+actually executing the command (the command will only be printed).
+
+[command] is the string that will be executed with root permissions.
+
+Visit https://github.com/dbb/suq for the README or to report any issues.
+
+EOF
+}
+
+exit 0;
+

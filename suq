@@ -64,7 +64,7 @@ EOF
 }
 
 sub version {
-    say "suq version $suq_version"
+    say "suq version $suq_version";
     exit 0;
 }
 

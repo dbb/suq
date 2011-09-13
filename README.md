@@ -20,6 +20,7 @@ If an `[option]` is found, the rest of the command string will be ignored.
 
 ## Environment variables
 `suq`'s behavior is controlled by the following environment variables:
+
 * `SUQ_NOLOGIN=1`           do *not* pass '-l' to su
 * `SUQ_PRESERVE=1`          pass "-m" to su
 * `SUQ_SHELL='shell'`       pass "-s shell" to su
@@ -30,13 +31,13 @@ Set the environment variable `SUQ_SIMULATE` in order to prevent suq from
 actually executing the command (the command will only be printed).
 Example:
 ```
-    % export SUQ\_SIMULATE=1; suq perl -le 'print "foo"'
+    % export SUQ_SIMULATE=1; suq perl -le 'print "foo"'
     su -l -c 'perl -le '\''print "foo"'\' root
     % 
 ```
 The default value of all aforementioned ENV variables is undefined. Setting a
 value to '' or 0 will cause it to be ignored (i.e. return it to the default
-value) except for SUQ_USER, which is treated as a string. To reset it:
+value) except for `SUQ_USER`, which is treated as a string. To reset it:
 `export SUQ_USER='root'`
 
 

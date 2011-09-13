@@ -20,13 +20,13 @@ If an `[option]` is found, the rest of the command string will be ignored.
 
 ## Environment variables
 `suq`'s behavior is controlled by the following environment variables:
--`SUQ_NOLOGIN=1`           do *not* pass '-l' to su
--`SUQ_PRESERVE=1`          pass "-m" to su
--`SUQ_SHELL='shell'`       pass "-s shell" to su
--`SUQ_SIMULATE=1`          print the command; don't run it
--`SUQ_USER='name'`         run command as "name" instead of root
+- `SUQ_NOLOGIN=1`           do *not* pass '-l' to su
+- `SUQ_PRESERVE=1`          pass "-m" to su
+- `SUQ_SHELL='shell'`       pass "-s shell" to su
+- `SUQ_SIMULATE=1`          print the command; don't run it
+- `SUQ_USER='name'`         run command as "name" instead of root
 
-Set the environment variable `SUQ\_SIMULATE` in order to prevent suq from
+Set the environment variable `SUQ_SIMULATE` in order to prevent suq from
 actually executing the command (the command will only be printed).
 Example:
 ```

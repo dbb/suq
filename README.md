@@ -34,7 +34,9 @@ If an `[option]` is found, the rest of the command string will be ignored.
 
 
 Set the environment variable `SUQ_SIMULATE` in order to prevent suq from
+
 actually executing the command (the command will only be printed).
+
 Example:
 
 ```
@@ -43,9 +45,9 @@ Example:
     % 
 ```
 
-The default value of all aforementioned ENV variables is undefined. Setting a
+The default value of all aforementioned ENV variables is `undefined`. Setting a
 
-value to '' or 0 will cause it to be ignored (i.e. return it to the default
+value to `''` or `0` will cause it to be ignored (i.e. return it to the default
 
 value) except for `SUQ_USER`, which is treated as a string. To reset it:
 

@@ -17,27 +17,40 @@ elsif ( $ARGV[0] eq '--version' ) {
 }
 # Otherwise, assume business as usual
 else {
-    &command;
+    my $cmd = config( \@ARGV );
+    out( $cmd );
 }
 
-sub command {
-    # First, we quote @ARGV. This is necessary for special commands like
-    # `aptitude install ~nzsh`
-    my $args = shell_quote @ARGV;
+# This function will actually figure out what the final command is, and store
+# it in an anonymous array.
+sub config {
+    my $arg_ref = shift;
+    my $cmd = shell_quote @$arg_ref;
 
     # some example "aliases"
-    # $args =~ s/\s*apin\s+/aptitude install -P /;
-    # $args =~ s/\s*appg\s+/aptitude purge -P /;
-    # $args =~ s/\s*aprm\s+/aptitude remove -P /;
+    # $cmd =~ s/\s*apin\s+/aptitude install -P /;
+    # $cmd =~ s/\s*appg\s+/aptitude purge -P /;
+    # $cmd =~ s/\s*aprm\s+/aptitude remove -P /;
 
-    # Now we quote the quoted command so that the whole thing can be passed
-    # as a single arg to -c
-    my $qtd = shell_quote $args;
+    my $qtd = shell_quote $cmd;
+    my $suq_opts = { };
+    my $suq_cmd = [ qw/ su / ];
+    my $switch_user = $ENV{SUQ_USER} // 'root';
+    
+    push @$suq_cmd, '-l'                    unless $ENV{SUQ_NOLOGIN};
+    push @$suq_cmd, '-s', "$ENV{SUQ_SHELL}" if $ENV{SUQ_SHELL};
+    push @$suq_cmd, '-m'                    if $ENV{SUQ_PRESERVE};
+    push @$suq_cmd, '-c', $qtd, $switch_user;
 
-    my $su_call = 'su -l -c ' . $qtd . ' root';
+    return $suq_cmd;
+}
 
-    say $su_call;
-    system $su_call unless $ENV{SUQ_SIMULATE};
+# This function decides what to do with the command array
+sub out {
+    my $cmd_ref = shift;
+    my $cmd_string = join ' ', @$cmd_ref;
+    say $cmd_string;
+    system $cmd_string unless $ENV{SUQ_SIMULATE};
 }
 
 sub help {
@@ -47,7 +60,20 @@ Usage: suq [options] [command]
 [options] is one of --help or --version
 [command] is the string that will be executed with root permissions
 
+Since it would be virtually impossible to distinguish options passed to suq
+from options meant for the final command, only these two options are parsed,
+and they *must* be the first argument.
+
 If an [option] is found, the rest of the command string will be ignored.
+
+The behavior of suq may be modified through the following ENV variables.
+
+SUQ_NOLOGIN=1           do *not* pass '-l' to su
+SUQ_PRESERVE=1          pass "-m" to su
+SUQ_SHELL='shell'       pass "-s shell" to su
+SUQ_SIMULATE=1          print the command; don't run it
+SUQ_USER='name'         run command as "name" instead of root
+
 
 Set the environment variable SUQ_SIMULATE in order to prevent suq from
 actually executing the command (the command will only be printed).
@@ -56,6 +82,10 @@ Example:
     su -l -c 'perl -le '\''print "foo"'\' root
     % 
 
+The default value of all these ENV variables is undefined. Setting a value to
+'' or 0 will cause it to be ignored (i.e. return it to the default value)
+except for SUQ_USER, which is treated as a string. To reset it, 
+export SUQ_USER='root'
 
 Visit https://github.com/dbb/suq for the README or to report any issues.
 

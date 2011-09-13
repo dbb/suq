@@ -1,57 +1,66 @@
 #!/usr/bin/env perl
 use 5.010;
 use strict;
-use String::ShellQuote; # Debian: libstring-shellquote-perl
+use String::ShellQuote;    # Debian: libstring-shellquote-perl
 use warnings;
 
 my $suq_version = '0.1';
 
+# Die if no args are given
+if ( $#ARGV == -1 ) {
+    help(); 
+    die "No arguments given";
+}
+
 # Since --help could potentially be a part of the command, we will only call
 # the sub if it's the first comand line arg.
-if ( $ARGV[0] eq '--help' ) {
-    &help;
+elsif ( $ARGV[ 0 ] eq '--help' ) {
+    help();
+    exit 0;
 }
+
 # Same for version
-elsif ( $ARGV[0] eq '--version' ) {
-    &version;
+elsif ( $ARGV[ 0 ] eq '--version' ) {
+    version();
 }
+
 # Otherwise, assume business as usual
 else {
     my $cmd = config( \@ARGV );
     out( $cmd );
 }
 
-# This function will actually figure out what the final command is, and store
-# it in an anonymous array.
 sub config {
+    # This function will actually figure out what the final command is, and
+    # store it in an anonymous array.
     my $arg_ref = shift;
-    my $cmd = shell_quote @$arg_ref;
+    my $cmd     = shell_quote @$arg_ref;
 
     # some example "aliases"
     # $cmd =~ s/\s*apin\s+/aptitude install -P /;
     # $cmd =~ s/\s*appg\s+/aptitude purge -P /;
     # $cmd =~ s/\s*aprm\s+/aptitude remove -P /;
 
-    my $qtd = shell_quote $cmd;
-    my $suq_opts = { };
-    my $suq_cmd = [ qw/ su / ];
-    my $switch_user = $ENV{SUQ_USER} // 'root';
-    
-    push @$suq_cmd, '-l'                    unless $ENV{SUQ_NOLOGIN};
-    push @$suq_cmd, '-s', "$ENV{SUQ_SHELL}" if $ENV{SUQ_SHELL};
-    push @$suq_cmd, '-m'                    if $ENV{SUQ_PRESERVE};
+    my $qtd         = shell_quote $cmd;
+    my $suq_opts    = {};
+    my $suq_cmd     = [ qw/ su / ];
+    my $switch_user = $ENV{ SUQ_USER } // 'root';
+
+    push @$suq_cmd, '-l' unless $ENV{ SUQ_NOLOGIN };
+    push @$suq_cmd, '-s', "$ENV{SUQ_SHELL}" if $ENV{ SUQ_SHELL };
+    push @$suq_cmd, '-m' if $ENV{ SUQ_PRESERVE };
     push @$suq_cmd, '-c', $qtd, $switch_user;
 
     return $suq_cmd;
-}
+} ## end sub config
 
-# This function decides what to do with the command array
 sub out {
+    # This function decides what to do with the command array
     my $cmd_ref = shift;
     my $cmd_string = join ' ', @$cmd_ref;
     say $cmd_string;
-    system $cmd_string unless $ENV{SUQ_SIMULATE};
-}
+    system $cmd_string unless $ENV{ SUQ_SIMULATE };
+} ## end sub out
 
 sub help {
     print <<'EOF';
@@ -90,8 +99,7 @@ export SUQ_USER='root'
 Visit https://github.com/dbb/suq for the README or to report any issues.
 
 EOF
-    exit 0;
-}
+} ## end sub help
 
 sub version {
     say "suq version $suq_version";
